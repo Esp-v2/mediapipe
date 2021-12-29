@@ -17,6 +17,7 @@ holistic = mp_holistic.Holistic(
 # Prepare DrawingSpec for drawing the face landmarks later.
 mp_drawing = mp.solutions.drawing_utils
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+mp_face_mesh = mp.solutions.face_mesh
 
 # サンプル動画を読み込み静止画に分解し、imagesフォルダーに保管
 base_path = r"C:\Users\proje\Desktop\Sign_Language\DataSets"
@@ -113,7 +114,7 @@ def mediapipe_static(dir_input, dir_output_image, dir_output_csv, name):
                 data = pd.concat([data, data1], ignore_index=True)
 
             try:
-                cv2.imwrite(dir_output_image + str(idx) + file +
+                #cv2.imwrite(dir_output_image + str(idx) + file +
                             '.png', annotated_image)
             except UnboundLocalError:
                 pass
