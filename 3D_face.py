@@ -26,7 +26,7 @@ def main():
     landmark_image = cv2.cvtColor(
         landmark_image, cv2.COLOR_BGR2RGB)  # BGRtoRGB
     landmark_image = Image.fromarray(landmark_image.astype(np.uint8))
-    landmark_image.show()
+    # landmark_image.show()
 
     height, width, channels = image.shape[:3]
     # ランドマークの色情報を取得
@@ -38,16 +38,25 @@ def main():
 
 
 # 顔のランドマークの色情報を抽出する
+"""
+image:cv2.imreadで読み込んだ画像
+xyz:ランドマークの座標
+height:画像の高さサイズ
+width:画像の幅サイズ
+"""
+
+
 def color(image, xyz, height, width):
     label = ['r', 'g', 'b']
     data = []
-    for index in range(len(xyz)):
-        b = image[int(xyz.iloc[index, 0]*height),
-                  int(xyz.iloc[index, 1]*width), 0]
-        g = image[int(xyz.iloc[index, 0]*height),
-                  int(xyz.iloc[index, 1]*width), 1]
-        r = image[int(xyz.iloc[index, 0]*height),
-                  int(xyz.iloc[index, 1]*width), 2]
+    for _ in range(len(xyz)):
+        x = int(xyz.iloc[_, 0]*width)
+        y = int(xyz.iloc[_, 1]*height)
+
+        b = int(image[y, x, 0])
+        g = int(image[y, x, 1])
+        r = int(image[y, x, 2])
+
         data.append([r, g, b])
 
     df = pd.DataFrame(data, columns=label)
