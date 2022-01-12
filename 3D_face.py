@@ -15,7 +15,7 @@ drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 
 def main():
-    image = cv2.imread('/Users/shu/Desktop/kanae.jpg')
+    image = cv2.imread(r'C:\Users\proje\Desktop\test.jpg')
     results = holistic.process(
         cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
@@ -26,7 +26,7 @@ def main():
     landmark_image = cv2.cvtColor(
         landmark_image, cv2.COLOR_BGR2RGB)  # BGRtoRGB
     landmark_image = Image.fromarray(landmark_image.astype(np.uint8))
-    # landmark_image.show()
+    landmark_image.save("landmark.jpg")
 
     height, width, channels = image.shape[:3]
     # ランドマークの色情報を取得
