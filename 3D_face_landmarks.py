@@ -1,4 +1,4 @@
-import os
+import glob
 import cv2
 import numpy as np
 import pandas as pd
@@ -16,9 +16,10 @@ drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 
 def main():
-    folder = os.listdir("/Users/shu/Desktop/datasets/neutral")
-    for file in folder:
-        image = cv2.imread(file)
+    files = glob.glob("C:\\Users\\proje\\Desktop\\DataSets\\GENKI-R2009a\\datasets\\neutral\\*")
+    df_xyz_rgb=pd.DataFrame(index=[], columns=[])
+    for fname in files:
+        image = cv2.imread(fname)
         results = holistic.process(
             cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
