@@ -1,3 +1,4 @@
+import os
 import glob
 import cv2
 import numpy as np
@@ -16,8 +17,13 @@ drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 
 def main():
-    files = glob.glob(
-        "C:\\Users\\proje\\Desktop\\DataSets\\GENKI-R2009a\\datasets\\neutral\\*")
+    if os.name == 'nt':  # windows
+        files = glob.glob(
+            "C:\\Users\\proje\\Desktop\\DataSets\\GENKI-R2009a\\datasets\\neutral\\*")
+    else:  # mac
+        files = glob.glob(
+            "/Users/shu/Desktop/DataSets/GENKI-R2009a/datasets/neutral/*")
+
     multi_xyz_rgb = pd.DataFrame(index=[], columns=[])
     for fname in files:
         image = cv2.imread(fname)
