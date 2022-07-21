@@ -26,6 +26,7 @@ def main():
 
     multi_xyz_rgb = pd.DataFrame(index=[], columns=[])
     for fname in files:
+        print(fname)
         image = cv2.imread(fname)
         results = holistic.process(
             cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -49,7 +50,9 @@ def main():
         xyz_rgb = pd.concat([df_xyz, df_rgb], axis=1)
         xyz_rgb = pd.DataFrame(np.ravel(xyz_rgb.values))  # 平滑化
         # 複数枚のxyz-rgb
-        multi_xyz_rgb = pd.concat([multi_xyz_rgb, xyz_rgb], axis=0)
+        multi_xyz_rgb = pd.concat([multi_xyz_rgb, xyz_rgb], axis=1)
+
+        print(multi_xyz_rgb)
 
     multi_xyz_rgb.to_csv('./xyzrgb.csv', header=False, index=False)
 
@@ -67,13 +70,20 @@ def color(image, xyz, height, width):
     label = ['r', 'g', 'b']
     data = []
     for _ in range(len(xyz)):
-        if xyz.iloc[_, 0].isnull() or xyz.iloc[_, 1].isnull() or xyz.iloc[_, 0].isnull():
+        if pd.isna(xyz.iloc[_, 0]) or pd.isna(xyz.iloc[_, 1]) or pd.isna(xyz.iloc[_, 2]):
             b = np.nan
             g = np.nan
             r = np.nan
         else:
-            x = int(xyz.iloc[_, 0]*width)
-            y = int(xyz.iloc[_, 1]*height)
+            if xyz.iloc[_, 0] >= 1:
+                x = 1
+                print("異常値！")
+            x = int(xyz.iloc[_, 0]*width)-1
+
+            if xyz.iloc[_, 1] >= 1:
+                y = 1
+                print("異常値！")
+            y = int(xyz.iloc[_, 1]*height)-1
 
             b = int(image[y, x, 0])
             g = int(image[y, x, 1])
