@@ -65,17 +65,18 @@ def color(image, xyz, height, width):
     label = ['r', 'g', 'b']
     data = []
     for _ in range(len(xyz)):
-        if xyz.iloc[_, 0] != np.nan or xyz.iloc[_, 1] != np.nan or xyz.iloc[_, 0] != np.nan:
+        if xyz.iloc[_, 0].isnull() or xyz.iloc[_, 1].isnull() or xyz.iloc[_, 0].isnull():
+            b = np.nan
+            g = np.nan
+            r = np.nan
+        else:
             x = int(xyz.iloc[_, 0]*width)
             y = int(xyz.iloc[_, 1]*height)
 
             b = int(image[y, x, 0])
             g = int(image[y, x, 1])
             r = int(image[y, x, 2])
-        else:
-            b = np.nan
-            g = np.nan
-            r = np.nan
+
         data.append([r, g, b])
 
     df = pd.DataFrame(data, columns=label)
