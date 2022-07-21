@@ -75,16 +75,19 @@ def color(image, xyz, height, width):
             g = np.nan
             r = np.nan
         else:
-            if xyz.iloc[_, 0] >= 1:
+            if xyz.iloc[_, 0] > 1:
                 x = 1
-                print("異常値！")
-            x = int(xyz.iloc[_, 0]*width)-1
+            x = int(xyz.iloc[_, 0]*(width-1))
 
-            if xyz.iloc[_, 1] >= 1:
+            if xyz.iloc[_, 1] > 1:
                 y = 1
-                print("異常値！")
-            y = int(xyz.iloc[_, 1]*height)-1
-
+            y = int(xyz.iloc[_, 1]*(height-1))
+            
+            if x>width-1:
+                x=width-1
+            if y>height-1:
+                y=height-1
+                
             b = int(image[y, x, 0])
             g = int(image[y, x, 1])
             r = int(image[y, x, 2])
