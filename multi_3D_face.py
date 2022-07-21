@@ -33,11 +33,13 @@ def main():
         # ランドマークの座標dataframeとarray_imageを取得
         df_xyz, landmark_image = landmark(image)
 
+        """
         # ランドマーク記載画像を整形
         landmark_image = cv2.cvtColor(
             landmark_image, cv2.COLOR_BGR2RGB)  # BGRtoRGB
         landmark_image = Image.fromarray(landmark_image.astype(np.uint8))
         landmark_image.save("landmark.jpg")
+        """
 
         height, width, channels = image.shape[:3]
         # ランドマークの色情報を取得
