@@ -16,8 +16,9 @@ drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 
 def main():
-    files = glob.glob("C:\\Users\\proje\\Desktop\\DataSets\\GENKI-R2009a\\datasets\\neutral\\*")
-    df_xyz_rgb=pd.DataFrame(index=[], columns=[])
+    files = glob.glob(
+        "C:\\Users\\proje\\Desktop\\DataSets\\GENKI-R2009a\\datasets\\neutral\\*")
+    multi_xyz_rgb = pd.DataFrame(index=[], columns=[])
     for fname in files:
         image = cv2.imread(fname)
         results = holistic.process(
@@ -38,9 +39,11 @@ def main():
 
         # xyzとrgb結合
         xyz_rgb = pd.concat([df_xyz, df_rgb], axis=1)
-        df_xyz_rgb = pd.concat([df_xyz_rgb, xyz_rgb], axis=0)
+        xyz_rgb = pd.DataFrame(np.ravel(xyz_rgb.values))  # 平滑化
+        # 複数枚のxyz-rgb
+        multi_xyz_rgb = pd.concat([multi_xyz_rgb, xyz_rgb], axis=0)
 
-    df_xyz_rgb.to_csv('./xyzrgb.csv', header=False, index=False)
+    multi_xyz_rgb.to_csv('./xyzrgb.csv', header=False, index=False)
 
 
 # 顔のランドマークの色情報を抽出する
@@ -56,13 +59,17 @@ def color(image, xyz, height, width):
     label = ['r', 'g', 'b']
     data = []
     for _ in range(len(xyz)):
-        x = int(xyz.iloc[_, 0]*width)
-        y = int(xyz.iloc[_, 1]*height)
+        if xyz.iloc[_, 0] != np.nan or xyz.iloc[_, 1] != np.nan or xyz.iloc[_, 0] != np.nan:
+            x = int(xyz.iloc[_, 0]*width)
+            y = int(xyz.iloc[_, 1]*height)
 
-        b = int(image[y, x, 0])
-        g = int(image[y, x, 1])
-        r = int(image[y, x, 2])
-
+            b = int(image[y, x, 0])
+            g = int(image[y, x, 1])
+            r = int(image[y, x, 2])
+        else:
+            b = np.nan
+            g = np.nan
+            r = np.nan
         data.append([r, g, b])
 
     df = pd.DataFrame(data, columns=label)
