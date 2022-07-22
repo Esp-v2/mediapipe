@@ -48,10 +48,8 @@ def main():
 
         # xyzとrgb結合
         xyz_rgb = pd.concat([df_xyz, df_rgb], axis=1)
-        xyz_rgb = pd.DataFrame(np.ravel(xyz_rgb.values))  # 平滑化
         # 複数枚のxyz-rgb
-        multi_xyz_rgb = pd.concat([multi_xyz_rgb, xyz_rgb], axis=1)
-
+        multi_xyz_rgb = pd.concat([multi_xyz_rgb, xyz_rgb], axis=0)
         print(multi_xyz_rgb)
 
     multi_xyz_rgb.to_csv('./xyzrgb.csv', header=False, index=False)
@@ -67,40 +65,46 @@ width:画像の幅サイズ
 
 
 def color(image, xyz, height, width):
-    label = ['r', 'g', 'b']
+    label = []
     data = []
-    for _ in range(len(xyz)):
-        if pd.isna(xyz.iloc[_, 0]) or pd.isna(xyz.iloc[_, 1]) or pd.isna(xyz.iloc[_, 2]):
+    length = int(len(xyz.columns)/3)
+    for _ in range(length):
+        index = _*3
+        x = xyz.iloc[0, index]
+        y = xyz.iloc[0, index+1]
+        z = xyz.iloc[0, index+2]
+
+        if pd.isna(x) or pd.isna(y) or pd.isna(z):
             b = np.nan
             g = np.nan
             r = np.nan
         else:
-            if xyz.iloc[_, 0] > 1:
+            if x > 1:
                 x = 1
-            x = int(xyz.iloc[_, 0]*(width-1))
+            x = int(x*(width-1))
 
-            if xyz.iloc[_, 1] > 1:
+            if y > 1:
                 y = 1
-            y = int(xyz.iloc[_, 1]*(height-1))
-            
-            if x>width-1:
-                x=width-1
-            if y>height-1:
-                y=height-1
-                
+            y = int(y*(height-1))
+
+            if x > width-1:
+                x = width-1
+            if y > height-1:
+                y = height-1
+
             b = int(image[y, x, 0])
             g = int(image[y, x, 1])
             r = int(image[y, x, 2])
+        data.extend([r, g, b])
+        label.extend([str(_)+"_r", str(_)+"_g", str(_)+"_b"])
 
-        data.append([r, g, b])
-
-    df = pd.DataFrame(data, columns=label)
+    df = pd.DataFrame([data], columns=label)
     return df
 
 
 # 顔のランドマーク
 def face(results, annotated_image):
-    label = ["x", "y", "z"]
+    label = []
     data = []
     if results.face_landmarks:
         # ランドマークを描画する
@@ -111,13 +115,14 @@ def face(results, annotated_image):
             landmark_drawing_spec=drawing_spec,
             connection_drawing_spec=drawing_spec)
 
-        for landmark in results.face_landmarks.landmark:
-            data.append([landmark.x, landmark.y, landmark.z])
+        for index, landmark in enumerate(results.face_landmarks.landmark):
+            data.extend([landmark.x, landmark.y, landmark.z])
+            label.extend([str(index)+"_x", str(index)+"_y", str(index)+"_z"])
 
     else:  # 検出されなかったら欠損値nanを登録する
+        print("検出なし！")
         data.append([np.nan, np.nan, np.nan])
-
-    df = pd.DataFrame(data, columns=label)
+    df = pd.DataFrame([data], columns=label)
     return df
 
 
