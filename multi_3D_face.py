@@ -121,7 +121,10 @@ def face(results, annotated_image):
 
     else:  # 検出されなかったら欠損値nanを登録する
         print("検出なし！")
-        data.append([np.nan, np.nan, np.nan])
+        for i in range(468*3):
+            data.append(np.nan)
+        [label.extend([str(i)+"_x", str(i)+"_y", str(i)+"_z"])
+         for i in range(468)]
     df = pd.DataFrame([data], columns=label)
     return df
 
@@ -130,7 +133,6 @@ def face(results, annotated_image):
 def landmark(image):
     results = holistic.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     annotated_image = image.copy()
-
     # ランドマーク取得
     df_xyz = face(results, annotated_image)
     return df_xyz, annotated_image
