@@ -52,7 +52,7 @@ def main():
         multi_xyz_rgb = pd.concat([multi_xyz_rgb, xyz_rgb], axis=0)
         print(multi_xyz_rgb)
 
-    multi_xyz_rgb.to_csv('./xyzrgb.csv', header=False, index=False)
+    multi_xyz_rgb.to_csv('./xyzrgb.csv', header=True, index=True)
 
 
 # 顔のランドマークの色情報を抽出する
