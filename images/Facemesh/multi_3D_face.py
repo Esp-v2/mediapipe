@@ -13,7 +13,7 @@ mp_face_mesh = mp.solutions.face_mesh
 facemesh = mp_face_mesh.FaceMesh(
     static_image_mode=True,
     max_num_faces=1,
-    refine_landmarks=True,
+    refine_landmarks=True,  # 468 or 478
     min_detection_confidence=0.5)
 mp_drawing = mp.solutions.drawing_utils
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
