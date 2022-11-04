@@ -22,7 +22,7 @@ drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 def main():
     if os.name == 'nt':  # windows
         files = glob.glob(
-            "C:\\Users\\proje\\Desktop\\DataSets\\GENKI-R2009a\\datasets\\smile\\*")
+            "C:\\Users\\proje\\Desktop\\DataSets\\CelebA\\test\\*")
     else:  # mac
         files = glob.glob(
             "/Users/shu/Desktop/DataSets/GENKI-R2009a/datasets/test/*")
@@ -55,7 +55,7 @@ def main():
         multi_xyz_rgb = pd.concat([multi_xyz_rgb, xyz_rgb], axis=0)
         print(multi_xyz_rgb)
 
-    multi_xyz_rgb.to_csv('./xyzrgb.csv', header=False, index=False)
+    multi_xyz_rgb.to_csv('./xyzrgb.csv', header=True, index=False)
 
 
 # 顔のランドマークの色情報を抽出する
@@ -110,6 +110,7 @@ def face(results, annotated_image):
     label = []
     data = []
 
+
     for face_landmarks in results.multi_face_landmarks:
         if results.multi_face_landmarks:
             # ランドマークを描画する
@@ -130,7 +131,7 @@ def face(results, annotated_image):
             for i in range(478*3):
                 data.append(np.nan)
             [label.extend([str(i)+"_x", str(i)+"_y", str(i)+"_z"])
-             for i in range(478)]
+            for i in range(478)]
         df = pd.DataFrame([data], columns=label)
     return df
 
