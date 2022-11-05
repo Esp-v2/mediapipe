@@ -29,26 +29,26 @@ def main():
 
     multi_xyz_rgb = pd.DataFrame(index=[], columns=[])
     for fname in files:
-        print(fname)
         image = cv2.imread(fname)
         results = facemesh.process(
             cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
         if results.multi_face_landmarks:
+            basename = os.path.basename(fname)
             # ランドマークの座標dataframeとarray_imageを取得
-            df_xyz, landmark_image = landmark(image)
+            df_xyz, annotated_image = landFace(basename, image, results)
 
             """
             # ランドマーク記載画像を整形
-            landmark_image = cv2.cvtColor(
-                landmark_image, cv2.COLOR_BGR2RGB)  # BGRtoRGB
-            landmark_image = Image.fromarray(landmark_image.astype(np.uint8))
-            landmark_image.save("landmark.jpg")
+            annotated_image = cv2.cvtColor(
+                annotated_image, cv2.COLOR_BGR2RGB)  # BGRtoRGB
+            annotated_image = Image.fromarray(annotated_image.astype(np.uint8))
+            annotated_image.save("annotated_image.jpg")
             """
 
             height, width, channels = image.shape[:3]
             # ランドマークの色情報を取得
-            df_rgb = color(image, df_xyz, height, width)
+            df_rgb = color(basename, image, df_xyz, height, width)
 
             # xyzとrgb結合
             xyz_rgb = pd.concat([df_xyz, df_rgb], axis=1)
@@ -68,7 +68,7 @@ width:画像の幅サイズ
 """
 
 
-def color(image, xyz, height, width):
+def color(basename, image, xyz, height, width):
     label = []
     data = []
     length = int(len(xyz.columns)/3)
@@ -102,48 +102,39 @@ def color(image, xyz, height, width):
         data.extend([r, g, b])
         label.extend([str(_)+"_r", str(_)+"_g", str(_)+"_b"])
 
-    df = pd.DataFrame([data], columns=label)
+    df = pd.DataFrame([data], columns=label, index=[basename])
     return df
 
 
 # 顔のランドマーク
-def face(results, annotated_image):
+def landFace(basename, image, results):
     label = []
     data = []
 
-    if results.multi_face_landmarks:
-        for face_landmarks in results.multi_face_landmarks:
-            if results.multi_face_landmarks:
-                # ランドマークを描画する
-                mp_drawing.draw_landmarks(
-                    image=annotated_image,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_TESSELATION,
-                    landmark_drawing_spec=drawing_spec,
-                    connection_drawing_spec=drawing_spec)
+    for face_landmarks in results.multi_face_landmarks:
+        if face_landmarks:
+            annotated_image = image.copy()
+            # ランドマークを描画する
+            mp_drawing.draw_landmarks(
+                image=annotated_image,
+                landmark_list=face_landmarks,
+                connections=mp_face_mesh.FACEMESH_TESSELATION,
+                landmark_drawing_spec=drawing_spec,
+                connection_drawing_spec=drawing_spec)
 
-                for index, landmark in enumerate(face_landmarks.landmark):
-                    data.extend([landmark.x, landmark.y, landmark.z])
-                    label.extend(
-                        [str(index)+"_x", str(index)+"_y", str(index)+"_z"])
+            for index, landmark in enumerate(face_landmarks.landmark):
+                data.extend([landmark.x, landmark.y, landmark.z])
+                label.extend(
+                    [str(index)+"_x", str(index)+"_y", str(index)+"_z"])
 
-            else:  # 検出されなかったら欠損値nanを登録する
-                print("検出なし！")
-                for i in range(478*3):
-                    data.append(np.nan)
-                [label.extend([str(i)+"_x", str(i)+"_y", str(i)+"_z"])
-                 for i in range(478)]
-            df = pd.DataFrame([data], columns=label)
-        return df
-
-
-# imageに対してmediapipeでランドマークを表示、出力する
-def landmark(image):
-    results = facemesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    annotated_image = image.copy()
-    # ランドマーク取得
-    df_xyz = face(results, annotated_image)
-    return df_xyz, annotated_image
+        else:  # 検出されなかったら欠損値nanを登録する
+            print("検出なし！")
+            for i in range(478*3):
+                data.append(np.nan)
+            [label.extend([str(i)+"_x", str(i)+"_y", str(i)+"_z"])
+                for i in range(478)]
+        df = pd.DataFrame([data], columns=label, index=[basename])
+    return df, annotated_image
 
 
 if __name__ == "__main__":
