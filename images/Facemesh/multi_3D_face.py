@@ -16,7 +16,9 @@ facemesh = mp_face_mesh.FaceMesh(
     refine_landmarks=True,  # 468 or 478
     min_detection_confidence=0.5)
 mp_drawing = mp.solutions.drawing_utils
-drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+mesh_drawing_spec = mp_drawing.DrawingSpec(thickness=1,  color=(0, 255, 0))
+mark_drawing_spec = mp_drawing.DrawingSpec(
+    thickness=1,  circle_radius=1, color=(0, 0, 255))
 
 
 def main():
@@ -38,13 +40,14 @@ def main():
             # ランドマークの座標dataframeとarray_imageを取得
             df_xyz, annotated_image = landFace(basename, image, results)
 
-            """
+            # """
             # ランドマーク記載画像を整形
             annotated_image = cv2.cvtColor(
                 annotated_image, cv2.COLOR_BGR2RGB)  # BGRtoRGB
             annotated_image = Image.fromarray(annotated_image.astype(np.uint8))
-            annotated_image.save("annotated_image.jpg")
-            """
+            # annotated_image.show()
+            annotated_image.save("./annotated_image.jpg")
+            # """
 
             height, width, channels = image.shape[:3]
             # ランドマークの色情報を取得
@@ -119,8 +122,8 @@ def landFace(basename, image, results):
                 image=annotated_image,
                 landmark_list=face_landmarks,
                 connections=mp_face_mesh.FACEMESH_TESSELATION,
-                landmark_drawing_spec=drawing_spec,
-                connection_drawing_spec=drawing_spec)
+                landmark_drawing_spec=mark_drawing_spec,
+                connection_drawing_spec=mesh_drawing_spec)
 
             for index, landmark in enumerate(face_landmarks.landmark):
                 data.extend([landmark.x, landmark.y, landmark.z])
