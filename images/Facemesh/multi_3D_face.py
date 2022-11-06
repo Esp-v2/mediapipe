@@ -24,7 +24,7 @@ mark_drawing_spec = mp_drawing.DrawingSpec(
 def main():
     if os.name == 'nt':  # windows
         files = glob.glob(
-            "C:\\Users\\proje\\Desktop\\DataSets\\CelebA\\neutral\\*")
+            "C:\\Users\\proje\\Desktop\\DataSets\\CelebA\\smile\\*")
     else:  # mac
         files = glob.glob(
             "/Users/shu/Desktop/DataSets/test/*")
